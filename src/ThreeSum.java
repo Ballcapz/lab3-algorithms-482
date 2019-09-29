@@ -2,6 +2,8 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Random;
 
 public class ThreeSum {
@@ -24,9 +26,14 @@ public class ThreeSum {
 
     public static void main(String args[])
     {
-//        verifyThreeSum();
-        runFullExperiment("ThreeSum-Ex1-Trash.txt");
-        runFullExperiment("ThreeSum-Ex2.txt");
+        System.out.println("three sum");
+        verifyThreeSum();
+        System.out.println("three sum faster");
+        verifyThreeSumFaster();
+        System.out.println("three sum fastest");
+        verifyThreeSumFastest();
+        //runFullExperiment("ThreeSum-Ex1-Trash.txt");
+        //runFullExperiment("ThreeSum-Ex2.txt");
     }
 
     static void runFullExperiment(String resultsFileName) {
@@ -98,6 +105,8 @@ public class ThreeSum {
 
 
                 int result = ThreeSum(testList);
+//                int result = ThreeSumFaster(testList);
+//                int result = ThreeSumFastest(testList);
 
 
 
@@ -144,6 +153,45 @@ public class ThreeSum {
 
     }
 
+    static void verifyThreeSumFaster() {
+
+        long[] testList1 = {-2, -4, 6};
+        long[] testList2 = {-2, -4, 6, 14, 2, -7, 11};
+
+        System.out.println("Array 1 : ");
+        printArray(testList1);
+        System.out.println("Array 2 : ");
+        printArray(testList2);
+
+        System.out.println("ThreeSum arrays... ");
+        int sum1 = ThreeSumFaster(testList1);
+        int sum2 = ThreeSumFaster(testList2);
+
+        System.out.println("\nSum Array 1: " + sum1);
+        System.out.println("Sum Array 2: " + sum2);
+
+    }
+
+    static void verifyThreeSumFastest() {
+
+        long[] testList1 = {-2, -4, 6};
+        long[] testList2 = {-2, -4, 6, 14, 2, -7, 11};
+
+        System.out.println("Array 1 : ");
+        printArray(testList1);
+        System.out.println("Array 2 : ");
+        printArray(testList2);
+
+        System.out.println("ThreeSum arrays... ");
+        int sum1 = ThreeSumFastest(testList1);
+        int sum2 = ThreeSumFastest(testList2);
+
+        System.out.println("\nSum Array 1: " + sum1);
+        System.out.println("Sum Array 2: " + sum2);
+
+    }
+
+
     public static int ThreeSum(long arr[]) {
         int N = arr.length;
         int count = 0;
@@ -155,7 +203,63 @@ public class ThreeSum {
         return count;
     }
 
+    public static int ThreeSumFaster(long arr[]) {
+        int N = arr.length;
+        int count = 0;
+        // sort the array so it can be used for binary search later
+        Arrays.sort(arr); // ~ nlogn
+        /*
+         iterate over the list twice, and binary search for the complement of the sum
+         generated from adding nums when they are less than 0 from the first 2 iterations
+        */
+        for (int i = 0; i < N && arr[i] < 0; i++) {
+            for (int j = i + 1; j < N && arr[i] + arr[j] < 0; j++) {
+                // if complement of sum is found, add to count of 3sums, only search from current loc in array on up
+                int k = Arrays.binarySearch(arr, j+1, N, -arr[i] - arr[j]);
+                if (k > j) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
 
+    public static int ThreeSumFastest(long arr[]) {
+        int N = arr.length;
+        int count = 0;
+        // add a hash map to check against rather than a third iteration
+        HashMap<Long, long[]> hashMap = new HashMap<Long, long[]>();
+        // sort the list
+        Arrays.sort(arr);
+
+        // iterate over the array twice and check for complement in a hash map
+        for (int i = 0; i < N - 2 && arr[i] < 0; i++) {
+            // empty the hashMap for the next iteration through the list
+            hashMap.clear();
+
+            // check the map if i = 0 or if i's value is greater than prv i value
+            if (i == 0 || arr[i] > arr[i - 1]) {
+                for (int j = i + 1; j < N; j++) {
+                    // if the complement is found in the hashMap add to count
+                    if (hashMap.containsKey(arr[j])) {
+                        count++;
+
+                        // remove the duplicates from the array that were used
+                        while (j < (N - 1) && arr[j] == arr[j + 1]) j++;
+                    } else {
+                        // create temp arr to insert into hashmap to check against
+                        long[] tempArr = new long[2];
+                        tempArr[0] = arr[i];
+                        tempArr[1] = arr[j];
+                        // insert the values to check against
+                        hashMap.put(0 - (arr[i] + arr[j]), tempArr);
+                    }
+                }
+            }
+        }
+
+        return count;
+    }
 
     /* UTILITY FUNCTIONS */
     /* A utility function to print array of size n */
