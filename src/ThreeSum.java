@@ -13,7 +13,7 @@ public class ThreeSum {
     static long MAXVALUE =  2000000000;
     static long MINVALUE = -2000000000;
     static int numberOfTrials = 1;
-    static int MAXINPUTSIZE  = (int) Math.pow(2,16);
+    static int MAXINPUTSIZE  = (int) Math.pow(2, 16);
     static int MININPUTSIZE  =  1;
     static int SIZEINCREMENT = 2;
 
@@ -26,14 +26,14 @@ public class ThreeSum {
 
     public static void main(String args[])
     {
-        System.out.println("three sum");
-        verifyThreeSum();
-        System.out.println("three sum faster");
-        verifyThreeSumFaster();
-        System.out.println("three sum fastest");
-        verifyThreeSumFastest();
-        //runFullExperiment("ThreeSum-Ex1-Trash.txt");
-        //runFullExperiment("ThreeSum-Ex2.txt");
+//        System.out.println("three sum");
+//        verifyThreeSum();
+//        System.out.println("three sum faster");
+//        verifyThreeSumFaster();
+//        System.out.println("three sum fastest");
+//        verifyThreeSumFastest();
+        runFullExperiment("ThreeSumFastest-TRASH.txt");
+        runFullExperiment("ThreeSumFastest-Ex2.txt");
     }
 
     static void runFullExperiment(String resultsFileName) {
@@ -51,11 +51,13 @@ public class ThreeSum {
         ThreadCpuStopWatch TrialStopwatch = new ThreadCpuStopWatch(); // for timing an individual trial
 
 
-        resultsWriter.println("#InputSize    AverageTime"); // # marks a comment in gnuplot data
+        resultsWriter.println("#InputSize    AverageTime        DoublingRatio"); // # marks a comment in gnuplot data
 
         resultsWriter.flush();
 
         /* for each size of input we want to test: in this case starting small and doubling the size each time */
+//        double[] timeRatios;
+        double previousTime = 0;
 
         for(int inputSize=MININPUTSIZE;inputSize<=MAXINPUTSIZE; inputSize*=SIZEINCREMENT) {
 
@@ -104,9 +106,9 @@ public class ThreeSum {
                 /////////////////////////////////////////
 
 
-                int result = ThreeSum(testList);
+                //int result = ThreeSum(testList);
 //                int result = ThreeSumFaster(testList);
-//                int result = ThreeSumFastest(testList);
+                int result = ThreeSumFastest(testList);
 
 
 
@@ -122,10 +124,15 @@ public class ThreeSum {
             //batchElapsedTime = BatchStopwatch.elapsedTime(); // *** comment this line if timing trials individually
 
             double averageTimePerTrialInBatch = (double) batchElapsedTime / (double)numberOfTrials; // calculate the average time per trial in this batch
+            double doublingRatio = 0;
+            if (previousTime > 0) {
+                doublingRatio = averageTimePerTrialInBatch / previousTime;
+            }
 
+            previousTime = averageTimePerTrialInBatch;
             /* print data for this size of input */
 
-            resultsWriter.printf("%12d  %15.2f \n",inputSize, averageTimePerTrialInBatch); // might as well make the columns look nice
+            resultsWriter.printf("%12d  %18.2f %18.1f\n",inputSize, averageTimePerTrialInBatch, doublingRatio); // might as well make the columns look nice
 
             resultsWriter.flush();
 
